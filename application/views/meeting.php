@@ -90,6 +90,11 @@
 	        		$n = $this->session->userdata('n');
 	        	}
 		?>
+			<?php
+				if ($this->session->has_userdata('status_role')) {
+					echo "<p class='text text-danger' align='center'>" .$this->session->flashdata('status_role') ."</p>";
+				}
+			?>
 	        <form id="form2" action="<?php echo base_url('home/listrole'); ?>" method="GET" accept-charset="utf-8">
 				    <div class="form-group">
 		        	<label class="control-label col-md-5 col-sm-3 col-xs-12" for="n_role">Jumlah yang dibutuhkan</label>
@@ -122,9 +127,17 @@
               new_element.setAttribute('readonly', 'readonly');
               new_element.setAttribute('style', 'border:none;');
               new_element.setAttribute('value', y);
-              new_element.setAttribute('name', 'rolelist[]');
+              // new_element.setAttribute('name', 'rolelist'+id+'[]');
+
+              var new_element2 = document.createElement('input');
+              new_element2.setAttribute('type', 'hidden');
+              // new_element2.setAttribute('readonly', 'readonly');
+              // new_element2.setAttribute('style', 'border:none;');
+              new_element2.setAttribute('value', x);
+              new_element2.setAttribute('name', 'rolelist'+id+'[]');
 
               div.appendChild(new_element);
+              div.appendChild(new_element2);
             }
           </script>
           <?php
@@ -144,7 +157,7 @@
 		        <div class="form-group">
 	        		<input type="text" name="mr_name[]" class="form-control" value="" placeholder="Nama Peran <?php echo $i ?>" required />
 	        		<input type="number" min="0" max="100" name="pro_quo[]" class="form-control" value="" placeholder="Kuorum" required />
-	        		<select id="nama<?php echo $i; ?>" name="nama[]" class="form-control" required >
+	        		<select id="nama<?php echo $i; ?>" name="nama[]" class="form-control" >
 	        			<option value="">--- Nama ---</option>
 	        			<?php
 	        				if ($listperson != NULL) {

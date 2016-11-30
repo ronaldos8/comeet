@@ -79,6 +79,38 @@ class Schedule extends CI_Controller {
 
 	}
 
+	function success()
+	{
+		$data['isi'] = 'schedule_success';
+
+		if (!$this->session->has_userdata('status_save')) {
+			redirect(base_url(),'refresh');
+		}
+
+		$id = $this->session->flashdata('status_save');
+
+		if (is_array($id)) {
+			$q = "SELECT m_name FROM meeting WHERE m_id = ";
+			$c = count($id);
+			$i = 1;
+			foreach ($id as $value) {
+				if ($i == $c) {
+					$q .= "$value";
+				}else{
+					$q .= "$value or m_id = ";
+				}
+				$i++;
+			}
+		}else {
+			$q = "SELECT m_name FROM meeting WHERE m_id = $id";
+		}
+
+		$s = $this->db->query($q);
+		$data['m_name'] = $s->result();
+
+		$this->load->view('main', $data);
+	}
+
 }
 
 /* End of file schedule.php */

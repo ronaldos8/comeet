@@ -34,14 +34,55 @@
 		  		if ($list_schedule != NULL) {
 		  			foreach ($list_schedule as $value) {
 		  	?>
+		  				<style type="text/css" media="screen">
+		  					#classdetail {
+		  						display: none;
+		  					}
+
+		  					#detail{
+		  						/*background: red;*/
+		  						height: 80px;
+		  						width: 100px;
+		  						font-size: 18px;
+		  					}
+
+		  					#detail:hover {
+		  						/*background: blue;*/
+		  						height: 80px;
+		  						width: 100px;
+		  					}
+
+		  					#detail:hover #classdetail{
+		  						background: black;
+		  						opacity: .2;
+		  						display: block;
+		  						z-index: 99;
+		  						height: 80px;
+		  						width: 100px;
+		  						margin-top: -50px;
+		  						margin-left: -20px;
+		  						padding-top: 50px;
+		  						padding-left: 20px;
+		  						font-size: 14px;
+		  					}
+
+		  					#classdetail > a {
+		  						color: white;
+		  						text-align: center;
+		  						text-decoration: none;
+		  					}
+		  				</style>
 		  				<div class="panel panel-default">
 							<div class="panel-body">
 				  				<div class="media">
 									<div class="media-left">
 								    	<a href="#">
-								    		<div class="col-md-12" align="center">
+								    		<div class="col-md-12" align="center" id="detail">
 								    			<?php echo date('d', strtotime($value->desc_time)); ?> <br>
 								    			<?php echo date('M', strtotime($value->desc_time)); ?>
+									    		<div class="col-md-12" id="classdetail" align="center">
+									    			<a href="<?php echo base_url('schedule/s/'); ?><?php echo $value->m_id; ?>" title="">Detail</a>
+									    		</div>
 								    		</div>
 								    	</a>
 								  	</div>
@@ -77,6 +118,7 @@
 						</div>
 		  	<?php
 		  			}
+		  			echo $pagination;
 		  		}else {
 		  	?>
 		  		<div class="panel panel-default">
