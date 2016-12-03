@@ -18,8 +18,8 @@
 	    <li><h4>Agenda anda mendatang</h4></li>
 	    <li>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</li>
 	    <li>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</li>
-	    <li role="presentation" class="<?php echo $sch; ?>"><a href="#Scheduling" aria-controls="Scheduling" role="tab" data-toggle="tab">Scheduling</a></li>
-	    <li role="presentation" class="<?php echo $unsch; ?>"><a href="#Unscheduling" aria-controls="Unscheduling" role="tab" data-toggle="tab">Unscheduling</a></li>
+	    <li role="presentation" class="<?php echo $sch; ?>"><a href="#Scheduling" aria-controls="Scheduling" role="tab" data-toggle="tab">Scheduled</a></li>
+	    <li role="presentation" class="<?php echo $unsch; ?>"><a href="#Unscheduling" aria-controls="Unscheduling" role="tab" data-toggle="tab">Unscheduled</a></li>
 	  </ul>
 	<br>
 	<!-- Tab panes -->
@@ -78,8 +78,22 @@
 									<div class="media-left">
 								    	<a href="#">
 								    		<div class="col-md-12" align="center" id="detail">
-								    			<?php echo date('d', strtotime($value->desc_time)); ?> <br>
-								    			<?php echo date('M', strtotime($value->desc_time)); ?>
+								    			<?php
+									    			/*if ($jadwal[$i]->row == 1) {
+									    				echo 'Senin';
+									    			}else if ($jadwal[$i]->row == 2) {
+									    				echo 'Selasa';
+									    			}else if ($jadwal[$i]->row == 3) {
+									    				echo 'Rabu';
+									    			}else if ($jadwal[$i]->row == 4) {
+									    				echo 'Kamis';
+									    			}else if ($jadwal[$i]->row == 5) {
+									    				echo 'Jumat';
+									    			}*/
+									    		?>
+									    		<br>
+								    			<?php echo $value->desc_time; ?> <br>
+								    			<?php //echo date('M', strtotime($value->desc_time)); ?>
 									    		<div class="col-md-12" id="classdetail" align="center">
 									    			<a href="<?php echo base_url('schedule/s/'); ?><?php echo $value->m_id; ?>" title="">Detail</a>
 									    		</div>

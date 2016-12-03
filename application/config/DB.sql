@@ -1,5 +1,7 @@
 create database project_comeet;
+
 use project_comeet;
+
 create table Personnel(
 	p_id int primary key auto_increment,
 	p_name varchar(20) not null,
@@ -32,10 +34,15 @@ create table Personnel_Role(
 	foreign key (mr_id) references Meeting_Role(mr_id),
 	foreign key (p_id)  references Personnel(p_id)
 );
+alter table Personnel_Role add column(pr_availability int null);
+alter table Personnel_Role add column(pr_utility int null);
+alter table Personnel_Role add column(pr_pivot int null);
 
 create table Slot(
 	slot_id int primary key auto_increment,
-	desc_time date
+	row int not null,
+	col int not null,
+	desc_time varchar(20) not null
 );
 
 create table Timetable(
@@ -44,4 +51,14 @@ create table Timetable(
 	slot_id int not null,
 	foreign key (m_id) references Meeting(m_id),
 	foreign key (slot_id) references Slot(slot_id)
+);
+
+create table calendar(
+	c_id int primary key auto_increment,
+	p_id int not null,
+	m_id int not null,
+	start_time varchar(5) not null,
+	end_time varchar(5) not null,
+	foreign key (p_id) references Personnel(p_id),
+	foreign key (m_id) references Meeting(m_id)
 );

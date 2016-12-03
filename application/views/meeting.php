@@ -139,6 +139,18 @@
               div.appendChild(new_element);
               div.appendChild(new_element2);
             }
+
+            function sembunyikan(x)
+			{
+				var str = x.value;
+				
+				// var op = document.getElementById('op'+str);
+				var op = document.getElementsByClassName('op'+str);
+				// alert(str);
+				var z = op.setAttribute('hidden', 'hidden');
+				alert(op);
+			}
+
           </script>
           <?php
             foreach ($listperson as $value) {
@@ -157,12 +169,12 @@
 		        <div class="form-group">
 	        		<input type="text" name="mr_name[]" class="form-control" value="" placeholder="Nama Peran <?php echo $i ?>" required />
 	        		<input type="number" min="0" max="100" name="pro_quo[]" class="form-control" value="" placeholder="Kuorum" required />
-	        		<select id="nama<?php echo $i; ?>" name="nama[]" class="form-control" >
+	        		<select id="nama<?php echo $i; ?>" onchange="sembunyikan(this)" name="nama[]" class="form-control" >
 	        			<option value="">--- Nama ---</option>
 	        			<?php
 	        				if ($listperson != NULL) {
 	        					foreach ($listperson as $value) {
-	        						echo "<option value='".$value->p_id."'>" .$value->p_name ."</option>";
+	        						echo "<option class='op" .$value->p_id ."' value='".$value->p_id."'>" .$value->p_name ."</option>";
 	        					}
 	        				}
 	        			?>

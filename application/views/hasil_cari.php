@@ -12,7 +12,10 @@
 		    	<div class="col-md-6" align="center">
 		    		<img src="" alt="Gambar" style="height: 100px; width: 200px;"><br>
 		    		Waktu Meeting <br>
-		    		<?php echo date('d-M-Y', strtotime($jadwal[$i]->desc_time)); ?>
+		    		<?php
+		    			echo $hari[$i];
+		    		?>
+		    		<?php echo $jadwal[$i]->desc_time; ?>
 		    	</div>
 		    	<div class="col-md-6">
 		    		<b>Kuorum Satisfaction</b>

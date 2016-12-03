@@ -1,13 +1,19 @@
 <?php
+/*
+* class schedule untuk mengedit dan mengupdate meeting
+*/
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Schedule extends CI_Controller {
 
 	public function index()
 	{
-		
+		// code
 	}
 
+	/*
+	* fungsi untuk mengedit jadwal meeting yang belum terjadwalkan
+	*/
 	function edit($m_id = NULL, $step = NULL)
 	{
 		if ($m_id == NULL) {
@@ -22,6 +28,7 @@ class Schedule extends CI_Controller {
 				$data['step'] = $step;
 			}else $data['step'] = 1;
 
+			// mengambil data personnel yang terlibat di meeting
 			$q = "SELECT a.p_name as p_name, a.p_id as p_id, c.mr_name as mr_name, c.pro_quo as pro_quo, c.mr_id as mr_id FROM personnel a, personnel_role b, meeting_role c, meeting d WHERE d.m_id = c.m_id and a.p_id = b.p_id and b.mr_id = c.mr_id and c.m_id = $m_id";
 
 			$s = $this->db->query($q);

@@ -1,4 +1,7 @@
 <?php
+/**
+* class default yang akan dipanggl ketika user membuka aplikasi comeet
+*/
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Home extends CI_Controller {
@@ -9,10 +12,16 @@ class Home extends CI_Controller {
 		$this->load->library('pagination');
 	}
 
+	/**
+	* fungsi ini berfungsi untuk menampilkan halaman awal / home
+	* @param rdr, parameter ini berfungsi untuk menerima redirect, jika di set maka home akan menampilkan data unscheduled
+	*/
 	public function index($rdr = NULL)
 	{
+		// view home
 		$data['isi'] = 'home2';
 
+		// untuk mengecek rdr berasal dari proses menyimpan atau pagination
 		if ($rdr == 'rdr') {
 			$data['rdr'] = 'fromsaving';
 			$rdr = 1;
@@ -20,11 +29,12 @@ class Home extends CI_Controller {
 			$rdr = 1;
 		}
 
-		// mengambil data unschedule
+		// mengambil data unscheduled
 		$q = "SELECT * FROM meeting WHERE not exists(select m_id from Timetable where Timetable.m_id = meeting.m_id)";
 		$s = $this->db->query($q);
 		$data['list_unschedule'] = $s->result();
 
+		// mengambil data personel berdasarkan m_id tersebut
 		foreach ($data['list_unschedule'] as $value) {
 			$id = $value->m_id;
 			$q = "select a.p_name from personnel a, personnel_role b, meeting_role c, meeting d where d.m_id = c.m_id and a.p_id = b.p_id and b.mr_id = c.mr_id and c.m_id = $id";
@@ -34,12 +44,14 @@ class Home extends CI_Controller {
 
 		// mengambil data scheduling
 		$q = "SELECT * FROM meeting a, Timetable b, slot c WHERE a.m_id = b.m_id and b.slot_id = c.slot_id";
-		$s = $this->db->query($q);
-		$num_row = $s->num_rows();
+		$total_sch = $this->db->query($q);
+		$num_row = $total_sch->num_rows();
+		$rdr-=1;
 		$q = "SELECT * FROM meeting a, Timetable b, slot c WHERE a.m_id = b.m_id and b.slot_id = c.slot_id limit 4 offset $rdr";
 		$s = $this->db->query($q);
 		$data['list_schedule'] = $s->result();
 
+		// mengambil data personnel yang ada pada meeting
 		foreach ($data['list_schedule'] as $value) {
 			$id = $value->m_id;
 			$q = "select a.p_name from personnel a, personnel_role b, meeting_role c, meeting d where d.m_id = c.m_id and a.p_id = b.p_id and b.mr_id = c.mr_id and c.m_id = $id";
@@ -83,6 +95,9 @@ class Home extends CI_Controller {
 		$this->load->view('main', $data);
 	}
 
+	/**
+	* fungsi untuk menambahkan personnel baru
+	*/
 	function add_personnel()
 	{
 		if (isset($_POST['p_name'])) {
@@ -95,11 +110,11 @@ class Home extends CI_Controller {
 		}
 	}
 
-	function cari()
-	{
-		echo $_POST['q'];
-	}
-
+	/**
+	* fungsi yang menghandle form pendaftaran meeting
+	* setiap step(1-3) menyimpan data kedalam session
+	* ketika memasuki step 4 data disimpan ke database
+	*/
 	function meeting($step = NULL, $lr = NULL)
 	{
 		$data['isi'] = 'meeting';
@@ -109,6 +124,7 @@ class Home extends CI_Controller {
 			$data['step'] = 1;
 		}else redirect(base_url('home/meeting/'),'refresh');
 
+		// memasukan data dari form ke session
 		if (isset($_SESSION)) {
 			$data['m_name'] = $this->session->userdata('m_name');
 			$data['m_desc'] = $this->session->userdata('m_desc');
@@ -118,6 +134,7 @@ class Home extends CI_Controller {
 			$data['m_end'] = $this->session->userdata('end');
 		}
 
+		// mengambil id terbesar (id yang terakhir kali dimasukan)
 		if ($step == 4) {
 			if ($this->session->has_userdata('nama')) {
 				$this->db->select('max(m_id) as max_id');
@@ -126,17 +143,18 @@ class Home extends CI_Controller {
 			}else redirect(base_url('home/meeting/'),'refresh');
 		}
 
-		if ($lr != NULL) {
-			$data['n'] = $lr;
-		}
-
 		$s = $this->db->get('Personnel');
 		$data['listperson'] = $s->result();
 		$this->load->view('main', $data);
 	}
 
+	/*
+	* fungsi untuk menambahkan data meeting baru
+	* setiap step akan  menyimpan data kedalam session
+	*/
 	function add_meeting()
 	{
+		// step 1
 		if (isset($_POST['submit1'])) {
 			$array = array(
 				'm_name' => $_POST['m_name'],
@@ -146,7 +164,7 @@ class Home extends CI_Controller {
 			$this->session->set_userdata($array);
 
 			redirect(base_url('home/meeting/2'),'refresh');
-		}else if (isset($_POST['submit2'])) {
+		}else if (isset($_POST['submit2'])) { //step 2
 			$array = array(
 				'venue' => $_POST['venue'],
 				'duration' => $_POST['duration'],
@@ -157,9 +175,8 @@ class Home extends CI_Controller {
 			$this->session->set_userdata( $array );
 
 			redirect(base_url('home/meeting/3'),'refresh');
-		}else if (isset($_POST['submit3'])) {
+		}else if (isset($_POST['submit3'])) { //step 3
 			
-			// print_r($_POST);
 			if (isset($_POST['rolelist1'])) {
 				$i = 1;
 				foreach ($_POST['mr_name'] as $value) {
@@ -181,14 +198,16 @@ class Home extends CI_Controller {
 			);
 			$this->session->set_userdata( $array );
 
-			// print_r($rolelist);
-			
+			// menyimpan ke database
 			$this->save_meeting();
 
 			redirect(base_url('home/meeting/4'),'refresh');
 		}
 	}
 
+	/*
+	* fungsi yang mengandle penambahan peran ketika mengisi form meeting
+	*/
 	function listrole()
 	{
 		$this->session->set_userdata('n', $_GET['n']);
@@ -196,86 +215,95 @@ class Home extends CI_Controller {
 		redirect($r,'refresh');
 	}
 
+	/*
+	* fungsi untuk menyimpan data dari form ke database
+	*/
 	function save_meeting()
 	{
-		// if (isset($_POST['simpan'])) {
-			// insert ke tabel meeting
-			$data['m_name'] = $this->session->userdata('m_name');
-			$data['m_desc'] = $this->session->userdata('m_desc');
-			$data['venue'] = $this->session->userdata('venue');
-			$data['duration'] = $this->session->userdata('duration');
-			$data['start_period'] = $this->session->userdata('start');
-			$data['end_period'] = $this->session->userdata('end');
-			$data['n_accomodate'] = $this->session->userdata('n');
+		// mengambil data yang ada di session untuk dimasukan kedalam database (table meeting)
+		$data['m_name'] = $this->session->userdata('m_name');
+		$data['m_desc'] = $this->session->userdata('m_desc');
+		$data['venue'] = $this->session->userdata('venue');
+		$data['duration'] = $this->session->userdata('duration');
+		$data['start_period'] = $this->session->userdata('start');
+		$data['end_period'] = $this->session->userdata('end');
+		$data['n_accomodate'] = $this->session->userdata('n');
 
-			$this->db->insert('meeting', $data);
+		$this->db->insert('meeting', $data);
 
-			if ($this->db->affected_rows() > 0) {
-				$this->db->select('max(m_id) as max_id');
-				$this->db->from('meeting');
-				$s = $this->db->get();
-				$s = $s->row();
-				
-				$err = 1;
-
-				$data2['m_id'] = $s->max_id;
-				$rolelist = $this->session->userdata('nama');
-				for ($i = 0; $i < $data['n_accomodate']; $i++) {
-					// insert ke tabel meeting role
-					$data2['mr_name'] = $_SESSION['mr_name'][$i];
-					$data2['pro_quo'] = $_SESSION['pro_quo'][$i];
-					$this->db->insert('meeting_role', $data2);
-					
-					if ($this->db->affected_rows() > 0) {
-						// insert ke table personnel role
-						$this->db->select('max(mr_id) as max_mr_id');
-						$this->db->from('meeting_role');
-						$s = $this->db->get();
-						$s = $s->row();
-						
-						// insert ke tabel meeting role
-						$data3['mr_id'] = $s->max_mr_id;
-						foreach ($rolelist[$i+1] as $value) {
-							// foreach ($value as $value2) {
-								$data3['p_id'] = $value;
-								$this->db->insert('personnel_role', $data3);
-							// }
-						}
-						
-						$err = 0;
-					}
-				}
-				
-
-			}
+		if ($this->db->affected_rows() > 0) {
+			// mengambil id terakhir yang diinput yang akan dimasukan ke tabel meeting_role
+			$this->db->select('max(m_id) as max_id');
+			$this->db->from('meeting');
+			$s = $this->db->get();
+			$s = $s->row();
 			
-			/*if ($err == 0) {
-				$this->session->sess_destroy();
-				$this->session->set_flashdata('status_save', 'Pertemuan berhasil disimpan.');
-				$r = base_url('home/index/rdr');
-				redirect($r,'refresh');
-			}*/
-		// }
+			$err = 1;
+
+			$data2['m_id'] = $s->max_id;
+			$rolelist = $this->session->userdata('nama');
+			for ($i = 0; $i < $data['n_accomodate']; $i++) {
+				// insert ke tabel meeting role
+				$data2['mr_name'] = $_SESSION['mr_name'][$i];
+				$data2['pro_quo'] = $_SESSION['pro_quo'][$i];
+				$this->db->insert('meeting_role', $data2);
+				
+				if ($this->db->affected_rows() > 0) {
+					// insert ke table personnel role
+					$this->db->select('max(mr_id) as max_mr_id');
+					$this->db->from('meeting_role');
+					$s = $this->db->get();
+					$s = $s->row();
+					
+					// insert ke tabel meeting role
+					$data3['mr_id'] = $s->max_mr_id;
+					foreach ($rolelist[$i+1] as $value) {
+						$data3['p_id'] = $value;
+						$this->db->insert('personnel_role', $data3);
+					}
+					
+					$err = 0;
+				}
+			}
+		}
 	}
 
+	/*
+	* fungsi untuk mencari jadwal dan menampilkan rekomendasi jadwalnya
+	*/
 	function carijadwal()
 	{
 		if (isset($_POST['m_id'])) {
 			$data['isi'] = 'hasil_cari';
 
+			// mengambil nilai max slot_id
 			$this->db->select('max(slot_id) as max_id');
 			$this->db->from('slot');
 			$s = $this->db->get();
 			$s = $s->row();
 			$rdm = $s->max_id;
 			
+			// mencari jadwal berdasarkan slot_d yang di random
 			$m_id = $_POST['m_id'];
+			$i = 0;
 			if (is_array($m_id)) {
 				foreach ($_POST['m_id'] as $value) {
 					$n = rand(1, $rdm);
 					$this->db->where('slot_id', $n);
 					$s = $this->db->get('slot');
-					$data['jadwal'][] = $s->row();
+					$data['jadwal'][$i] = $s->row();
+
+					if ($data['jadwal'][$i]->row == 1) {
+		    				$data['hari'][$i] = 'Senin';
+	    			}else if ($data['jadwal'][$i]->row == 2) {
+	    				$data['hari'][$i] = 'Selasa';
+	    			}else if ($data['jadwal'][$i]->row == 3) {
+	    				$data['hari'][$i] = 'Rabu';
+	    			}else if ($data['jadwal'][$i]->row == 4) {
+	    				$data['hari'][$i] = 'Kamis';
+	    			}else if ($data['jadwal'][$i]->row == 5) {
+	    				$data['hari'][$i] = 'Jumat';
+	    			}
 
 					$this->db->where('m_id', $value);
 					$s = $this->db->get('meeting_role');
@@ -284,6 +312,8 @@ class Home extends CI_Controller {
 					$this->db->where('m_id', $value);
 					$s = $this->db->get('meeting');
 					$data['list_schedule'][] = $s->row();
+
+					$i++;
 				}
 			}else {
 				$n = rand(1, $rdm);
@@ -304,18 +334,40 @@ class Home extends CI_Controller {
 		}else redirect(base_url('home/index/rdr'),'refresh');
 	}
 
+	/*
+	* fungsi untuk menambahkan meeting unschedule menjadi schedule
+	*/
 	function scheduling()
 	{
-		$this->db->select('max(slot_id) as max_id');
-		$this->db->from('slot');
-		$s = $this->db->get();
-		$s = $s->row();
 		$i = 0;
 		foreach ($_POST['m_id'] as $value) {
 			$n = $_POST['jadwal'][$i];
 			$data['m_id'] = $value;
 			$data['slot_id'] = $n;
 			$this->db->insert('Timetable', $data);
+
+			// mengambil data p_id di suatu meeting
+			$q ="SELECT a.p_id as p_id FROM personnel a, personnel_role b, meeting_role c, meeting d WHERE d.m_id = c.m_id and a.p_id = b.p_id and b.mr_id = c.mr_id and c.m_id = $value";
+			$p_id = $this->db->query($q);
+			$p_id = $p_id->result();
+
+			// mengambil desc_time suatu meeting
+			$q = "select a.desc_time desc_time from slot a, timetable b where b.slot_id = a.slot_id and b.m_id = $value";
+			$desc_time = $this->db->query($q);
+			$desc_time = $desc_time->row();
+
+			// memecah desc time menjadi start time dan end time
+			$string = $desc_time->desc_time;
+			$str = explode('-', $string, 2);
+
+			// insert data ke table calendar
+			foreach ($p_id as $value2) {
+				$object['p_id'] = $value2->p_id;
+				$object['m_id'] = $value;
+				$object['start_time'] = $str[0];
+				$object['end_time'] = $str[1];
+				$this->db->insert('Calendar', $object);
+			}
 			$i++;
 		}
 
