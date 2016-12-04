@@ -1,3 +1,91 @@
+<script type="text/javascript" charset="utf-8" async defer>
+	function minggu(x)
+	{
+		var date = new Date();
+
+		// mengambil nilai start
+		var start = document.getElementById('start_period');
+		var val1 = start.value;
+		var arr = val1.split('-', 3);
+		var s_full = date.setFullYear(arr[0], arr[1], arr[2]);
+
+		// mengambil tanggal terakhir bulan ini
+		var lastDay = 32 - new Date(arr[0], arr[1], 32).getDate();
+
+		// mengambil waktu seminggu kemudian dari start
+		if (x == 1) {
+			var e_day = parseInt(arr[2]) + parseInt(7);
+		}else if(x == 2) {
+			var e_day = parseInt(arr[2]) + parseInt(14);
+		}else if(x == 3) {
+			var e_day = parseInt(arr[2]) + parseInt(21);
+		}
+		var e_month;
+		if (e_day > lastDay) {
+			e_month = parseInt(arr[1]) + parseInt(1);
+			e_day = e_day - lastDay;
+			if (e_day < 10) {
+				e_day = "0"+e_day;
+			}
+		}else {
+			e_month = parseInt(arr[1]);
+		}
+		var e_year;
+		if (e_month > 12) {
+			e_month = e_month - 12;
+			if (e_month < 10) {
+				e_month = "0"+e_month;
+			}
+			e_year = parseInt(arr[0]) + parseInt(1);
+		}else {
+			e_year = parseInt(arr[0]);
+		}
+		var val = e_year+"-"+e_month+"-"+e_day;
+
+		// mengisi end period
+		var end  = document.getElementById('end_period');
+		end.value = val;
+	}
+</script>
+<script type="text/javascript" charset="utf-8" async defer>
+	function add_person(id)
+	{
+	  var element = document.getElementById('nama'+id);
+	  var x = element.value;
+	  var el = document.getElementById('person'+x);
+	  var y = el.value;
+	  var div = document.getElementById('dname'+id);
+
+	  var new_element = document.createElement('input');
+	  new_element.setAttribute('type', 'text');
+	  new_element.setAttribute('readonly', 'readonly');
+	  new_element.setAttribute('style', 'border:none;');
+	  new_element.setAttribute('value', y);
+	  // new_element.setAttribute('name', 'rolelist'+id+'[]');
+
+	  var new_element2 = document.createElement('input');
+	  new_element2.setAttribute('type', 'hidden');
+	  // new_element2.setAttribute('readonly', 'readonly');
+	  // new_element2.setAttribute('style', 'border:none;');
+	  new_element2.setAttribute('value', x);
+	  new_element2.setAttribute('name', 'rolelist'+id+'[]');
+
+	  div.appendChild(new_element);
+	  div.appendChild(new_element2);
+	}
+
+	function sembunyikan(x)
+	{
+		var str = x.value;
+		
+		// var op = document.getElementById('op'+str);
+		var op = document.getElementsByClassName('op'+str);
+		// alert(str);
+		var z = op.setAttribute('hidden', 'hidden');
+		alert(op);
+	}
+</script>
+
 <h4>Membuat jadwal meeting</h4>
 
 <div class="panel panel-default">
@@ -64,15 +152,23 @@
         	<label class="control-label col-md-offset-1 col-sm-3 col-xs-12" for="period">Periode Meeting</label>
         	<div class="col-md-6 col-sm-6 col-xs-12">
     			<div class="form-group">
-    				<label class="col-md-offset-1" for="">Start</label>
+    				<label class="col-md-offset-1" for="start_period">Start</label>
         			<div class="col-md-12">
-		        		<input type="date" name="start" id="period" class="form-control" value="<?php if(isset($m_start)) echo $m_start; ?>" placeholder="Start" required />
+		        		<input type="date" name="start" id="start_period" class="form-control" value="<?php if(isset($m_start)) echo $m_start; ?>" placeholder="Start" required />
 		        	</div>
     			</div>
     			<div class="form-group">
-		        	<label class="col-md-offset-1" for="">End</label>
+		        	<label class="col-md-offset-1" for="">Rentang</label>
 		        	<div class="col-md-12 col-sm-12 col-xs-12">
-		        		<input type="date" name="end" id="period" class="form-control" value="<?php if(isset($m_end)) echo $m_end; ?>" placeholder="End" required />
+		        		<button type="button" class="btn btn-default btn-sm" onclick="minggu(1)">1 Minggu</button>
+		        		<button type="button" class="btn btn-default btn-sm" onclick="minggu(2)">2 Minggu</button>
+		        		<button type="button" class="btn btn-default btn-sm" onclick="minggu(3)">3 Minggu</button>
+		        	</div>
+		        </div>
+    			<div class="form-group">
+		        	<label class="col-md-offset-1" for="end_period">End</label>
+		        	<div class="col-md-12 col-sm-12 col-xs-12">
+		        		<input type="date" name="end" id="end_period" class="form-control" value="<?php if(isset($m_end)) echo $m_end; ?>" placeholder="End" required />
 		        	</div>
 		        </div>
         	</div>
@@ -113,45 +209,7 @@
 	        	
 	        </div>
 	        <br>
-          <script type="text/javascript" charset="utf-8" async defer>
-            function add_person(id)
-            {
-              var element = document.getElementById('nama'+id);
-              var x = element.value;
-              var el = document.getElementById('person'+x);
-              var y = el.value;
-              var div = document.getElementById('dname'+id);
-
-              var new_element = document.createElement('input');
-              new_element.setAttribute('type', 'text');
-              new_element.setAttribute('readonly', 'readonly');
-              new_element.setAttribute('style', 'border:none;');
-              new_element.setAttribute('value', y);
-              // new_element.setAttribute('name', 'rolelist'+id+'[]');
-
-              var new_element2 = document.createElement('input');
-              new_element2.setAttribute('type', 'hidden');
-              // new_element2.setAttribute('readonly', 'readonly');
-              // new_element2.setAttribute('style', 'border:none;');
-              new_element2.setAttribute('value', x);
-              new_element2.setAttribute('name', 'rolelist'+id+'[]');
-
-              div.appendChild(new_element);
-              div.appendChild(new_element2);
-            }
-
-            function sembunyikan(x)
-			{
-				var str = x.value;
-				
-				// var op = document.getElementById('op'+str);
-				var op = document.getElementsByClassName('op'+str);
-				// alert(str);
-				var z = op.setAttribute('hidden', 'hidden');
-				alert(op);
-			}
-
-          </script>
+          
           <?php
             foreach ($listperson as $value) {
           ?>

@@ -24,9 +24,9 @@ class Home extends CI_Controller {
 		// untuk mengecek rdr berasal dari proses menyimpan atau pagination
 		if ($rdr == 'rdr') {
 			$data['rdr'] = 'fromsaving';
-			$rdr = 1;
+			$rdr = 0;
 		}else if($rdr == NULL) {
-			$rdr = 1;
+			$rdr = 0;
 		}
 
 		// mengambil data unscheduled
@@ -46,7 +46,6 @@ class Home extends CI_Controller {
 		$q = "SELECT * FROM meeting a, Timetable b, slot c WHERE a.m_id = b.m_id and b.slot_id = c.slot_id";
 		$total_sch = $this->db->query($q);
 		$num_row = $total_sch->num_rows();
-		$rdr-=1;
 		$q = "SELECT * FROM meeting a, Timetable b, slot c WHERE a.m_id = b.m_id and b.slot_id = c.slot_id limit 4 offset $rdr";
 		$s = $this->db->query($q);
 		$data['list_schedule'] = $s->result();
