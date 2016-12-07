@@ -315,10 +315,23 @@ class Home extends CI_Controller {
 					$i++;
 				}
 			}else {
+				$i = 0;
 				$n = rand(1, $rdm);
 				$this->db->where('slot_id', $n);
 				$s = $this->db->get('slot');
-				$data['jadwal'][] = $s->row();
+				$data['jadwal'][$i] = $s->row();
+
+				if ($data['jadwal'][$i]->row == 1) {
+	    				$data['hari'][$i] = 'Senin';
+    			}else if ($data['jadwal'][$i]->row == 2) {
+    				$data['hari'][$i] = 'Selasa';
+    			}else if ($data['jadwal'][$i]->row == 3) {
+    				$data['hari'][$i] = 'Rabu';
+    			}else if ($data['jadwal'][$i]->row == 4) {
+    				$data['hari'][$i] = 'Kamis';
+    			}else if ($data['jadwal'][$i]->row == 5) {
+    				$data['hari'][$i] = 'Jumat';
+    			}
 
 				$this->db->where('m_id', $m_id);
 				$s = $this->db->get('meeting_role');
