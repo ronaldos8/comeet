@@ -1,0 +1,8 @@
+.LOG
+---Changelog Comeet---
+15:42 07-Dec-16
+- support add multiple persone to one role
+- 1 button to automaticly add range 1 week, 2 week, and 3 week on form
+- add person calendar
+- add pivot on database
+- add pagination
